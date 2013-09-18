@@ -7,8 +7,12 @@ kcdict={}
 gamma_kc = []
 rho_kc = []
 student_obj_dict={}
-beta = 0.5
+#beta = 0.5
 sr_list = []
+SSR_min = 9999999
+b_min = 0
+g_min = 0
+r_min = 0
 
 def timing(f):
     def wrap(*args):
@@ -19,10 +23,10 @@ def timing(f):
         return ret
     return wrap
 
-def init_gamma_rho():
+def init_gamma_rho(g,r):
 	for i in xrange(0,len(kcdict)):
-		gamma_kc.append(0.5)
-		rho_kc.append(0.5)
+		gamma_kc.append(g)
+		rho_kc.append(r)
 
 def createKCList():
 	id = 0
@@ -46,7 +50,8 @@ def update_student(student, right, kc):
 	student_obj_dict[student].success_param = sum(student_obj_dict[student].gamma)
 	student_obj_dict[student].fail_param = sum(student_obj_dict[student].rho)
 
-def do_pfa():
+def do_pfa(beta):
+	SSR = 0
 	with open('Asgn1dataset.csv','rb') as csvfile:
 		inputreader = csv.reader(csvfile, delimiter=',')
 		for row in inputreader:
@@ -67,17 +72,28 @@ def do_pfa():
 				student_obj_dict[student].rho = [0] * len(kcdict)
 				update_student(student, right, kc)
 			m = student_obj_dict[student].success_param + student_obj_dict[student].fail_param + beta
-			p = 1 / (1 + math.exp(-m))
+			if m < -9:
+				p = 0
+			else:
+				p = 1 / (1 + math.e**(-m))
 			sr = math.pow((p - int(right)),2)*int(first_att)
-			sr_list.append(sr)
-	print(sum(sr_list))
+			SSR = SSR + sr
+	return SSR
 
 def do_optimization():
-	for beta in [x/10 for x in xrange(-10,10)]:
-		for gamma in [y/10 for y in xrange(-10,10)]:
-			for rho in [z/10 for z in xrange(-10,10)]:
-				do_pfa()
-
+	global SSR_min
+	for beta in [x/10. for x in xrange(-10,10)]:
+		for gamma in [y/10. for y in xrange(0,10)]:
+			for rho in [z/10. for z in xrange(0,10)]:
+				init_gamma_rho(gamma,rho)
+				SSR = do_pfa(beta)
+				print beta, gamma, rho, SSR
+				if SSR < SSR_min:
+					SSR_min = SSR
+					g_min = gamma
+					r_min = rho
+					b_min = beta
+	
 createKCList()
-init_gamma_rho()
 do_optimization()
+print SSR_min, b_min, g_min, r_min
