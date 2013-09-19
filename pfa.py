@@ -47,6 +47,7 @@ def do_pfa(beta):
 	SSR = 0
 	with open('Asgn1dataset.csv','rb') as csvfile:
 		inputreader = csv.reader(csvfile, delimiter=',')
+		next(inputreader) #skip the first line
 		for row in inputreader:
 			p=0.0
 			idd = row[0]
