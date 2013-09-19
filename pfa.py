@@ -12,6 +12,7 @@ SSR_min = 9999999.0
 b_min = 0.0
 g_min = 0.0
 r_min = 0.0
+p_min = 0.0
 
 def init_gamma_rho(g,r):
 	global gamma_kc
@@ -75,24 +76,28 @@ def do_pfa(beta):
 			#print student_obj_dict[student].success_param,student_obj_dict[student].fail_param ,beta,m, right, p, first_att
 			sr = math.pow((p - int(right)),2)*int(first_att)
 			SSR = SSR + sr
-	return SSR
+	return SSR,p
 
 def do_optimization():
+	#with open('Asgn1dataOutput.a','wb') as afile:
+
 	global SSR_min
 	global g_min
 	global r_min
 	global b_min
-	for beta in [x/10. for x in xrange(-2,2)]:
-		for gamma in [y/10. for y in xrange(0,2)]:
-			for rho in [z/10. for z in xrange(0,2)]:
+	global p_min
+	for beta in [x/10. for x in xrange(-2,-1)]:
+		for gamma in [y/10. for y in xrange(1,2)]:
+			for rho in [z/10. for z in xrange(1,2)]:
 				init_gamma_rho(gamma,rho)
-				SSR = do_pfa(beta)
-				print beta, gamma, rho, SSR
-				if SSR < SSR_min:
+				SSR,p = do_pfa(beta)
+				print beta, gamma, rho, SSR, p
+				if SSR <= SSR_min:
 					SSR_min = SSR
 					g_min = gamma
 					r_min = rho
 					b_min = beta
+					p_min = p
 
 def do_optimization_test():
 	global SSR_min
@@ -103,4 +108,5 @@ def do_optimization_test():
 
 createKCList()
 do_optimization()
-print SSR_min, b_min, g_min, r_min
+print "Minimum: "
+print b_min, g_min, r_min, SSR_min, p_min
