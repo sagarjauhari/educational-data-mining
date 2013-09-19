@@ -79,9 +79,12 @@ def do_pfa(beta):
 
 def do_optimization():
 	global SSR_min
-	for beta in [x/10. for x in xrange(-10,10)]:
-		for gamma in [y/10. for y in xrange(0,10)]:
-			for rho in [z/10. for z in xrange(0,10)]:
+	global g_min
+	global r_min
+	global b_min
+	for beta in [x/10. for x in xrange(-2,2)]:
+		for gamma in [y/10. for y in xrange(0,2)]:
+			for rho in [z/10. for z in xrange(0,2)]:
 				init_gamma_rho(gamma,rho)
 				SSR = do_pfa(beta)
 				print beta, gamma, rho, SSR
